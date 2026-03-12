@@ -1,38 +1,25 @@
 import requests
-from bs4 import BeautifulSoup
-
-headers = {
-    "User-Agent":"Mozilla/5.0"
-}
 
 def search_amazon(query):
 
-    url = f"https://www.amazon.in/s?k={query}"
+    url = f"https://dummyjson.com/products/search?q={query}"
 
-    r = requests.get(url, headers=headers)
+    r = requests.get(url)
 
-    soup = BeautifulSoup(r.text,"html.parser")
+    data = r.json()
 
     products = []
 
-    items = soup.select(".s-result-item")
+    for item in data["products"]:
 
-    for item in items:
+        product = {
+            "name": item["title"],
+            "price": item["price"],
+            "website": "Online Store",
+            "url": "https://dummyjson.com",
+            "image": item["thumbnail"]
+        }
 
-        title = item.select_one("h2")
-        price = item.select_one(".a-price-whole")
-        image = item.select_one("img")
-
-        if title and price and image:
-
-            product = {
-                "name": title.text.strip(),
-                "price": int(price.text.replace(",","")),
-                "website":"Amazon",
-                "url":"https://www.amazon.in",
-                "image": image["src"]
-            }
-
-            products.append(product)
+        products.append(product)
 
     return products
